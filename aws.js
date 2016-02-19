@@ -87,12 +87,12 @@
 	  		})
 	  		.success(function (result) {
 	  			console.log("LOGEADO",result);
-	  			$rootScope.token = result;
+	  			$rootScope.logged = result;
 				deferred.resolve(result);
 	  		})
 	  		.error(function(data){
 	  			console.log("NO LOGEADO",data)
-	  			$rootScope.token = data;
+	  			$rootScope.logged = data;
 	  			deferred.reject;
 			});	
 			return deferred.promise;
@@ -111,11 +111,14 @@
 		*			.then(function (result) { 		
 		*/
 		this.ListObjects = function ( prefix, delimiter ) { 
-			var deferred = $q.defer();
+			var deferred = $q.defer(); 
 	  		$http({
 	  			method: 'POST',
 	  			url: 'http://indinet.es/aws/listobjects/',
-	  			data: {'prefix': prefix, 'delimiter': delimiter, 'token': $rootScope.token},
+	  			data: {'prefix': prefix, 'delimiter': delimiter, 
+	  					'token': $rootScope.logged.token,
+	  					'user': $rootScope.logged.user,
+	  				},
 	  			// withCredentials: true,
       //   		headers: {
       //               'Content-Type': 'application/json; charset=utf-8'
