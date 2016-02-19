@@ -86,11 +86,13 @@
 	  			// headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 	  		})
 	  		.success(function (result) {
-	  			console.log("LOGEADO",result)
+	  			console.log("LOGEADO",result);
+	  			$rootScope.token = result;
 				deferred.resolve(result);
 	  		})
 	  		.error(function(data){
 	  			console.log("NO LOGEADO",data)
+	  			$rootScope.token = data;
 	  			deferred.reject;
 			});	
 			return deferred.promise;
@@ -113,11 +115,11 @@
 	  		$http({
 	  			method: 'POST',
 	  			url: 'http://indinet.es/aws/listobjects/',
-	  			data: {'prefix': prefix, 'delimiter': delimiter},
+	  			data: {'prefix': prefix, 'delimiter': delimiter, 'token': $rootScope.token},
 	  			// withCredentials: true,
-        		// headers: {
-          //           'Content-Type': 'application/json; charset=utf-8'
-        		// }
+      //   		headers: {
+      //               'Content-Type': 'application/json; charset=utf-8'
+      //   		}
 	  		})
 	  		.success(function (result) { 
 	  			// Añade nombre a los folders  2015/prueba/1923  = 1923
