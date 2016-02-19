@@ -1,0 +1,21 @@
+{
+  "name": "manviny.aws",
+  "authors": [
+    "manol <manol@indinet.es>"
+  ],
+  "description": "logear y registrarse en aws",
+  "main": ["aws.js"],
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+    "dependencies": {      
+    "angular": "^1.3.0"
+  }
+}
