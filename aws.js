@@ -81,18 +81,47 @@
 	  		$http({
 	  			method: 'POST',
 	  			url: 'http://indinet.es/aws/login/',
-	  			// data: {'user': creds.email, 'pass': creds.password}
 	  			data: {'user': creds.username, 'pass': creds.password},
-	  			// headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 	  		})
 	  		.success(function (result) {
-	  			console.log("LOGEADO",result);
-	  			$rootScope.logged = result;
+	  			$rootScope.session = result;
+	  			$rootScope.session.user = creds.username;
+	  			console.log("LOGEADO",$rootScope.session);
 				deferred.resolve(result);
 	  		})
 	  		.error(function(data){
 	  			console.log("NO LOGEADO",data)
 	  			$rootScope.logged = data;
+	  			deferred.reject;
+			});	
+			return deferred.promise;
+		}
+		/**
+		* Get bucket files and folders from the given path (1 level, not recursive)
+		* @memberof DFS3
+	 	* @function getBucketContent	 		
+		* @param {path}  path from where to get content
+		* @returns {array} array of Objects => {files:files, folders:folders} -> (content_length, content_type, last_modified, name, path, type)
+	    * @example
+	    *   Usage:
+	    *   		DFS3.getBucketContent( || '' || '/' || 'path'|| '/path'|| 'path/' || '/path/')
+		*			.then(function (result) { 		
+		*/
+		this.logout = function (creds) {
+			var deferred = $q.defer();
+	  		$http({
+	  			method: 'POST',
+	  			url: 'http://indinet.es/aws/logout/',
+	  			data: {'user': creds.username},
+	  		})
+	  		.success(function (result) {
+	  			$rootScope.session = null;
+	  			console.log("Sesion terminada");
+				deferred.resolve(result);
+	  		})
+	  		.error(function(data){
+	  			console.log("Sesion terminada",data)
+	  			$rootScope.session.user = mull;
 	  			deferred.reject;
 			});	
 			return deferred.promise;
@@ -110,15 +139,17 @@
 	    *   		DFS3.getBucketContent( || '' || '/' || 'path'|| '/path'|| 'path/' || '/path/')
 		*			.then(function (result) { 		
 		*/
-		this.ListObjects = function ( prefix, delimiter ) { 
+		this.ListObjects = function ( path ) { 
+			$rootScope.session.path = path;
 			var deferred = $q.defer(); 
 	  		$http({
 	  			method: 'POST',
 	  			url: 'http://indinet.es/aws/listobjects/',
-	  			data: {'prefix': prefix, 'delimiter': delimiter, 
-	  					'token': $rootScope.logged.token,
-	  					'user': $rootScope.logged.user,
-	  				},
+	  			data: $rootScope.session 
+	  			// data: {'prefix': prefix, 'delimiter': delimiter, 
+	  			// 		'token': $rootScope.logged.token,
+	  			// 		'user': $rootScope.logged.user,
+	  			// 	},
 	  			// withCredentials: true,
       //   		headers: {
       //               'Content-Type': 'application/json; charset=utf-8'
