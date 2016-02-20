@@ -178,8 +178,8 @@
 				});
 	  			// Añade nombre a los files  2015/prueba/oto.png  = foto.png
 	  			angular.forEach(result.files, function(value, key) {
-	  				var temp = value.Key.split('/');
-	  				result.files[key]['name']=temp.pop();
+	  				result.files[key]['name']=value.Key.split('/').pop();
+	  				result.files[key]['type']=result.files[key]['name'].split('.').pop();
 				});
 	  			deferred.resolve(result);
 	  		})
