@@ -73,7 +73,7 @@
 	 * @description
 	 *   Services to use S3
 	 */     
-	.service('AWS',  function ($http, $q, $rootScope, INSTANCE_URL, localStorageService) {
+	.service('AWS',  function ($http, $q, $rootScope, INSTANCE_URL) {
 
 		// var userPath = '/api/v2/'+ BUCKET + '/';
 
@@ -99,7 +99,7 @@
 	  			$rootScope.session = result;
 	  			$rootScope.session.user = creds.username;
 	  			// guarda session en localstorage
-	  			localStorageService.set('session', $rootScope.session);
+	  		
 	  			console.log("LOGEADO",$rootScope.session);
 				deferred.resolve(result);
 	  		})
@@ -131,12 +131,12 @@
 	  		})
 	  		.success(function (result) {
 	  			$rootScope.session = null;
-				localStorageService.remove('session');
+				
 				deferred.resolve(result);
 	  		})
 	  		.error(function(data){
 	  			$rootScope.session.user = null;
-				localStorageService.remove('session');
+				
 	  			deferred.reject("Sesion terminada");
 			});	
 			return deferred.promise;
@@ -157,7 +157,7 @@
 		this.ListObjects = function ( path ) { 
 
 			// mantiene la session en localstorage			
-			$rootScope.session=localStorageService.get('session') 
+		
 
 			var deferred = $q.defer(); 
 			try { $rootScope.session.path = path; }
