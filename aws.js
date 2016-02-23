@@ -241,6 +241,35 @@
 			return deferred.promise;
 		};
 
+		/**
+		* deletes  file in S3
+		* @memberof AWS
+	 	* @function deleteFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.writehiddenjson = function (objectPath, content) { 
+
+
+			var deferred = $q.defer(); 
+			try { 
+				$rootScope.session.objectPath = objectPath;
+				$rootScope.session.content = content;
+			}
+			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/writehiddenjson/',
+	  			data: $rootScope.session 
+	  		})
+	  		.success(function (result) { 
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
+
 ///////////////////////////////////////////////////
 //					ADAPTAR
 ///////////////////////////////////////////////////
