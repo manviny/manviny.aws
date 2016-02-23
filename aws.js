@@ -216,6 +216,31 @@
 			return deferred.promise;
 		};
 
+
+		/**
+		* deletes  file in S3
+		* @memberof AWS
+	 	* @function deleteFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.deleteFile = function (objectPath) {
+			var deferred = $q.defer(); 
+			try { $rootScope.session.objectPath = objectPath;}
+			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/deleteobject/',
+	  			data: $rootScope.session 
+	  		})
+	  		.success(function (result) { 
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
+
 ///////////////////////////////////////////////////
 //					ADAPTAR
 ///////////////////////////////////////////////////
@@ -236,21 +261,7 @@
 
 
 
-		/**
-		* deletes  file in S3
-		* @memberof DFS3
-	 	* @function deleteFile	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.deleteFile = function (path, file) {
-			console.log(this.getPath(path, file))
-			var deferred = $q.defer();
-			$http.delete( this.getPath(path, file) ).then(function (result) {
-				 deferred.resolve(result.data);
-			}, deferred.reject);
-			return deferred.promise;
-		};
+
 
 		/**
 		* creates FOLDER file in S3
