@@ -195,6 +195,29 @@
 		* @param {path,name} path in S3, name of the file
 		* @returns {Hash} filterd attributes
 		*/
+		this.getFileContent = function (file) {
+			var deferred = $q.defer(); 
+			try { $rootScope.session.objectPath = file;}
+			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/getfilecontent/',
+	  			data: $rootScope.session 
+	  		})
+	  		.success(function (result) { deferred.resolve(result); })
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
+
+
+		/**
+		* get  FILE from S3
+		* @memberof DFS3
+	 	* @function getFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
 		this.getObjectUrl = function (file) {
 			var deferred = $q.defer(); 
 			try { $rootScope.session.file = file;}
@@ -248,22 +271,23 @@
 		* @param {path,name} path in S3, name of the file
 		* @returns {Hash} filterd attributes
 		*/
-		this.writehiddenjson = function (objectPath, content) { 
+		this.setFileContent = function (objectPath, content) { 
 
 
 			var deferred = $q.defer(); 
 			try { 
 				$rootScope.session.objectPath = objectPath;
-				$rootScope.session.content = content;
+				$rootScope.session.content = JSON.stringify(content);
 			}
 			catch(err) { deferred.reject; } // o existe session todavia -ª salir
 
 	  		$http({
 	  			method: 'POST',
-	  			url: 'aws/writehiddenjson/',
+	  			url: 'aws/setfilecontent/',
 	  			data: $rootScope.session 
 	  		})
 	  		.success(function (result) { 
+	  			console.log("CONTENIDO",result)
 	  			deferred.resolve(result);
 	  		})
 	  		.error(function(data){ deferred.reject; });	
