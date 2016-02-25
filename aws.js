@@ -196,6 +196,8 @@
 		* @returns {Hash} filterd attributes
 		*/
 		this.getFileContent = function (file) {
+			// save file data in json format to data.json in same folder
+			file = file.replace( file.match(/\/([^/]*)$/)[1], '._/'+'data.json' ); // data.json
 			var deferred = $q.defer(); 
 			try { $rootScope.session.objectPath = file;}
 			catch(err) { deferred.reject; } // o existe session todavia -ª salir
@@ -210,6 +212,39 @@
 			return deferred.promise;
 		};
 
+		/**
+		* deletes  file in S3
+		* @memberof AWS
+	 	* @function deleteFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.setFileContent = function (objectPath,  DATAJSON) { 
+			objectPath = objectPath.replace( objectPath.match(/\/([^/]*)$/)[1], '._/'+'data.json' );
+			console.log("objectPath",objectPath); 
+			console.log("CONTENIDO", DATAJSON); 
+
+			// push to data.json
+
+			var deferred = $q.defer(); 
+			try { 
+				$rootScope.session.objectPath = objectPath;
+				$rootScope.session.content = JSON.stringify(DATAJSON);
+			}
+			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/setfilecontent/',
+	  			data: $rootScope.session 
+	  		})
+	  		.success(function (result) { 
+	  			console.log("CONTENIDO",result)
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
 
 		/**
 		* get  FILE from S3
@@ -264,35 +299,6 @@
 			return deferred.promise;
 		};
 
-		/**
-		* deletes  file in S3
-		* @memberof AWS
-	 	* @function deleteFile	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.setFileContent = function (objectPath, content) { 
-
-
-			var deferred = $q.defer(); 
-			try { 
-				$rootScope.session.objectPath = objectPath;
-				$rootScope.session.content = JSON.stringify(content);
-			}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
-
-	  		$http({
-	  			method: 'POST',
-	  			url: 'aws/setfilecontent/',
-	  			data: $rootScope.session 
-	  		})
-	  		.success(function (result) { 
-	  			console.log("CONTENIDO",result)
-	  			deferred.resolve(result);
-	  		})
-	  		.error(function(data){ deferred.reject; });	
-			return deferred.promise;
-		};
 
 ///////////////////////////////////////////////////
 //					ADAPTAR
