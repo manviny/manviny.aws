@@ -22,34 +22,34 @@
     *   		<input type="file" file-model="myFile" />
 	*			<button ng-click="uploadFile()">upload me</button>		
 	*/	
-	.directive('fileModel', ['$parse', function ($parse) {
-	    return {
-	        restrict: 'A',
-	        link: function(scope, element, attrs) {
-	            var model = $parse(attrs.fileModel);
-	            var modelSetter = model.assign;
+	// .directive('fileModel', ['$parse', function ($parse) {
+	//     return {
+	//         restrict: 'A',
+	//         link: function(scope, element, attrs) {
+	//             var model = $parse(attrs.fileModel);
+	//             var modelSetter = model.assign;
 	            
-	            element.bind('change', function(){
-	                scope.$apply(function(){
-	                    modelSetter(scope, element[0].files);
-	                });
-	            });
-	        }
-	    };
-	}])
+	//             element.bind('change', function(){
+	//                 scope.$apply(function(){
+	//                     modelSetter(scope, element[0].files);
+	//                 });
+	//             });
+	//         }
+	//     };
+	// }])
 
-	.directive('fileChange', [
-	    function() {
-	        return {
-	            link: function(scope, element, attrs) {
-	                element[0].onchange = function() {
-	                    scope[attrs['fileChange']](element[0])
-	                }
-	            }
+	// .directive('fileChange', [
+	//     function() {
+	//         return {
+	//             link: function(scope, element, attrs) {
+	//                 element[0].onchange = function() {
+	//                     scope[attrs['fileChange']](element[0])
+	//                 }
+	//             }
 	            
-	        }
-	    }
-	])    
+	//         }
+	//     }
+	// ])    
     
 	.factory('httpInterceptor', function (INSTANCE_URL) {
 	 return {
@@ -196,8 +196,7 @@
 		* @returns {Hash} filterd attributes
 		*/
 		this.getFileContent = function (file) {
-			// save file data in json format to data.json in same folder
-			file = file.replace( file.match(/\/([^/]*)$/)[1], '._/'+'data.json' ); // data.json
+
 			var deferred = $q.defer(); 
 			try { $rootScope.session.objectPath = file;}
 			catch(err) { deferred.reject; } // o existe session todavia -ª salir
@@ -221,10 +220,6 @@
 		*/
 		this.setFileContent = function (objectPath,  DATAJSON) { 
 			objectPath = objectPath.replace( objectPath.match(/\/([^/]*)$/)[1], '._/'+'data.json' );
-			console.log("objectPath",objectPath); 
-			console.log("CONTENIDO", DATAJSON); 
-
-			// push to data.json
 
 			var deferred = $q.defer(); 
 			try { 
@@ -299,6 +294,31 @@
 			return deferred.promise;
 		};
 
+		/**
+		* creates FOLDER file in S3
+		* @memberof DFS3
+	 	* @function createFolder	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.createFolder = function (objectPath) {
+			var deferred = $q.defer(); 
+			try { $rootScope.session.objectPath = objectPath;}
+			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+			
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/setfilecontent/',
+	  			data: $rootScope.session 
+	  		})
+	  		.success(function (result) { 
+	  			console.log("CONTENIDO",result)
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
+
 
 ///////////////////////////////////////////////////
 //					ADAPTAR
@@ -322,20 +342,7 @@
 
 
 
-		/**
-		* creates FOLDER file in S3
-		* @memberof DFS3ΩΩΩ
-	 	* @function createFolder	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.createFolder = function (path, file) {
-			var deferred = $q.defer();
-			$http.post( this.getPath(path, file) + '/' ).then(function (result) {
-				 deferred.resolve(result.data);
-			}, deferred.reject);
-			return deferred.promise;
-		};
+
 
 
 		/**
