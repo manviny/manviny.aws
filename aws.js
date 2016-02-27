@@ -9,47 +9,7 @@
    *   Manage all related fucntions to chat
    */ 
 
-	angular.module('manviny.aws', [])
-
-	/**
-	* UPLOAD FILES
-	* @memberof DFS3
-    * @ngdoc directive   		
-	* @param {path}  path from where to get content
-	* @returns {array} array of Objects => {files:files, folders:folders} -> (content_length, content_type, last_modified, name, path, type)
-    * @example
-    *   Usage:
-    *   		<input type="file" file-model="myFile" />
-	*			<button ng-click="uploadFile()">upload me</button>		
-	*/	
-	// .directive('fileModel', ['$parse', function ($parse) {
-	//     return {
-	//         restrict: 'A',
-	//         link: function(scope, element, attrs) {
-	//             var model = $parse(attrs.fileModel);
-	//             var modelSetter = model.assign;
-	            
-	//             element.bind('change', function(){
-	//                 scope.$apply(function(){
-	//                     modelSetter(scope, element[0].files);
-	//                 });
-	//             });
-	//         }
-	//     };
-	// }])
-
-	// .directive('fileChange', [
-	//     function() {
-	//         return {
-	//             link: function(scope, element, attrs) {
-	//                 element[0].onchange = function() {
-	//                     scope[attrs['fileChange']](element[0])
-	//                 }
-	//             }
-	            
-	//         }
-	//     }
-	// ])    
+	angular.module('manviny.aws', [])  
     
 	.factory('httpInterceptor', function (INSTANCE_URL) {
 	 return {
@@ -278,14 +238,6 @@
 		};
 
 
-
-////////////
-////////////
-////////////
-
-
-
-
 		/**
 		* creates FOLDER file in S3
 		* @memberof DFS3
@@ -299,7 +251,7 @@
 	  		$http({
 	  			method: 'POST',
 	  			url: 'aws/setfilecontent/',
-	  			data: {objectPath: objectPath} 
+	  			data: {objectPath: objectPath, content:''} 
 	  		})
 	  		.success(function (result) { 
 	  			console.log("CONTENIDO",result)
@@ -309,30 +261,18 @@
 			return deferred.promise;
 		};
 
+////////////
+////////////
+////////////
+
+
+
+
+
 
 ///////////////////////////////////////////////////
 //					ADAPTAR
 ///////////////////////////////////////////////////
-		/**
-		* creates FILE in S3, its content is data
-		* @memberof DFS3
-	 	* @function createFile	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.createFile = function (path, file, data) {
-			var deferred = $q.defer();
-			$http.post( this.getPath(path, file), data ).then(function (result) {
-				 deferred.resolve(result.data);
-			}, deferred.reject);
-			return deferred.promise;
-		};
-
-
-
-
-
-
 
 
 		/**
