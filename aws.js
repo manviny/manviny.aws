@@ -156,26 +156,18 @@
 		*/
 		this.ListObjects = function ( path ) { 
 
-			// mantiene la session en localstorage			
-		
-
 			var deferred = $q.defer(); 
-			try { $rootScope.session.path = path; }
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
 
-
-	  		$http({
-	  			method: 'POST',
-	  			url: 'aws/listobjects/',
-	  			data: $rootScope.session 
-	  		})
+	  		$http({ method: 'POST', url: 'aws/listobjects/', data: {path:  path} })
 	  		.success(function (result) { 
 	  			console.log("ListObjects",result)
-	  			// Añade nombre a los folders  2015/prueba/1923  = 1923
+
+	  			// Añade campo nombre a los FOLDERS  2015/prueba/1923  = 1923
 	  			angular.forEach(result.folders, function(value, key) {
 	  				result.folders[key] ={'Prefix': value.Prefix, 'name': value.Prefix.match(/([^\/]*)\/*$/)[1]  }
 				});
-	  			// Añade nombre a los files  2015/prueba/oto.png  = foto.png
+
+	  			// Añade campo nombre a los FILES  2015/prueba/oto.png  = foto.png
 	  			angular.forEach(result.files, function(value, key) {
 	  				result.files[key]['name']=value.Key.split('/').pop();
 	  				result.files[key]['type']=result.files[key]['name'].split('.').pop();
@@ -186,7 +178,56 @@
 			return deferred.promise;
 		}
 
+		/**
+		* get  FILE from S3
+		* @memberof DFS3
+	 	* @function getFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.getObjectUrl = function (file) {
+			var deferred = $q.defer(); 
 
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/getobjecturl/',
+	  			data: {file: file} 
+	  		})
+	  		.success(function (result) { 
+	  			// Añade nombre a los folders  2015/prueba/1923  = 1923
+	  			angular.forEach(result.folders, function(value, key) {
+	  				result.folders[key] ={'Prefix': value.Prefix, 'name': value.Prefix.match(/([^\/]*)\/*$/)[1]  }
+				});
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
+
+
+
+
+		/**
+		* deletes  file in S3
+		* @memberof AWS
+	 	* @function deleteFile	 		
+		* @param {path,name} path in S3, name of the file
+		* @returns {Hash} filterd attributes
+		*/
+		this.deleteFile = function (objectPath) { 
+			var deferred = $q.defer(); 
+
+	  		$http({
+	  			method: 'POST',
+	  			url: 'aws/deleteobject/',
+	  			data: {objectPath: objectPath}  
+	  		})
+	  		.success(function (result) { 
+	  			deferred.resolve(result);
+	  		})
+	  		.error(function(data){ deferred.reject; });	
+			return deferred.promise;
+		};
 
 		/**
 		* get  FILE from S3
@@ -198,18 +239,18 @@
 		this.getFileContent = function (file) {
 
 			var deferred = $q.defer(); 
-			try { $rootScope.session.objectPath = file;}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
 
 	  		$http({
 	  			method: 'POST',
 	  			url: 'aws/getfilecontent/',
-	  			data: $rootScope.session 
+	  			data: {objectPath: file} 
 	  		})
 	  		.success(function (result) { deferred.resolve(result); })
 	  		.error(function(data){ deferred.reject; });	
 			return deferred.promise;
 		};
+
+
 
 		/**
 		* deletes  file in S3
@@ -222,16 +263,11 @@
 			objectPath = objectPath.replace( objectPath.match(/\/([^/]*)$/)[1], '._/'+'data.json' );
 
 			var deferred = $q.defer(); 
-			try { 
-				$rootScope.session.objectPath = objectPath;
-				$rootScope.session.content = JSON.stringify(DATAJSON);
-			}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
 
 	  		$http({
 	  			method: 'POST',
 	  			url: 'aws/setfilecontent/',
-	  			data: $rootScope.session 
+	  			data: {objectPath: objectPath, content:JSON.stringify(DATAJSON)} 
 	  		})
 	  		.success(function (result) { 
 	  			console.log("CONTENIDO",result)
@@ -241,58 +277,14 @@
 			return deferred.promise;
 		};
 
-		/**
-		* get  FILE from S3
-		* @memberof DFS3
-	 	* @function getFile	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.getObjectUrl = function (file) {
-			var deferred = $q.defer(); 
-			try { $rootScope.session.file = file;}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
-
-	  		$http({
-	  			method: 'POST',
-	  			url: 'aws/getobjecturl/',
-	  			data: $rootScope.session 
-	  		})
-	  		.success(function (result) { 
-	  			// Añade nombre a los folders  2015/prueba/1923  = 1923
-	  			angular.forEach(result.folders, function(value, key) {
-	  				result.folders[key] ={'Prefix': value.Prefix, 'name': value.Prefix.match(/([^\/]*)\/*$/)[1]  }
-				});
-	  			deferred.resolve(result);
-	  		})
-	  		.error(function(data){ deferred.reject; });	
-			return deferred.promise;
-		};
 
 
-		/**
-		* deletes  file in S3
-		* @memberof AWS
-	 	* @function deleteFile	 		
-		* @param {path,name} path in S3, name of the file
-		* @returns {Hash} filterd attributes
-		*/
-		this.deleteFile = function (objectPath) {
-			var deferred = $q.defer(); 
-			try { $rootScope.session.objectPath = objectPath;}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
+////////////
+////////////
+////////////
 
-	  		$http({
-	  			method: 'POST',
-	  			url: 'aws/deleteobject/',
-	  			data: $rootScope.session 
-	  		})
-	  		.success(function (result) { 
-	  			deferred.resolve(result);
-	  		})
-	  		.error(function(data){ deferred.reject; });	
-			return deferred.promise;
-		};
+
+
 
 		/**
 		* creates FOLDER file in S3
@@ -303,13 +295,11 @@
 		*/
 		this.createFolder = function (objectPath) {
 			var deferred = $q.defer(); 
-			try { $rootScope.session.objectPath = objectPath;}
-			catch(err) { deferred.reject; } // o existe session todavia -ª salir
 			
 	  		$http({
 	  			method: 'POST',
 	  			url: 'aws/setfilecontent/',
-	  			data: $rootScope.session 
+	  			data: {objectPath: objectPath} 
 	  		})
 	  		.success(function (result) { 
 	  			console.log("CONTENIDO",result)
