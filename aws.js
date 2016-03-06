@@ -120,7 +120,7 @@
 
 	  		$http({ method: 'POST', url: 'aws/listobjects/', data: {path:  path} })
 	  		.success(function (result) { 
-	  			console.log("ListObjects",result)
+	  			// console.log("ListObjects",result)
 
 	  			// Añade campo nombre a los FOLDERS  2015/prueba/1923  = 1923
 	  			angular.forEach(result.folders, function(value, key) {
@@ -131,6 +131,7 @@
 	  			angular.forEach(result.files, function(value, key) {
 	  				result.files[key]['name']=value.Key.split('/').pop();
 	  				result.files[key]['type']=result.files[key]['name'].split('.').pop();
+	  				result.files[key]['thumb']=result.Prefix+'._/'+result.files[key]['name'];
 				});
 	  			deferred.resolve(result);
 	  		})
@@ -220,7 +221,6 @@
 		* @returns {Hash} filterd attributes
 		*/
 		this.setFileContent = function (objectPath,  DATAJSON) { 
-			objectPath = objectPath.replace( objectPath.match(/\/([^/]*)$/)[1], '._/'+'data.json' );
 
 			var deferred = $q.defer(); 
 
